@@ -49,7 +49,7 @@ header span{font-size:12px;color:#888;background:#f0efe8;padding:3px 10px;border
 .badge-2{background:#EEEDFE;color:#3C3489;}
 .badge-3{background:#FAEEDA;color:#633806;}
 .qsentence{font-size:15px;line-height:1.8;color:#1a1a18;margin-bottom:1.1rem;}
-.blank{display:inline-block;min-width:120px;border-bottom:2px solid #999;padding:0 4px;color:#aaa;font-style:italic;text-align:center;vertical-align:bottom;}
+.blank{display:inline-block;min-width:120px;border-bottom:2px solid #555;padding:0 6px;vertical-align:bottom;}
 .opts{display:flex;flex-direction:column;gap:7px;margin-bottom:0.75rem;}
 .opt{background:#f5f4f0;border:1px solid #e0dfd8;border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;color:#1a1a18;font-family:inherit;text-align:left;transition:all 0.12s;line-height:1.4;}
 .opt:hover{background:#fff;border-color:#aaa;}
@@ -75,7 +75,7 @@ header span{font-size:12px;color:#888;background:#f0efe8;padding:3px 10px;border
 
 /* ERROR CORRECTION */
 .error-sentence{font-size:15px;line-height:1.8;color:#1a1a18;margin-bottom:1rem;padding:10px 12px;background:#f5f4f0;border-radius:8px;}
-.error-word{background:#FCEBEB;color:#A32D2D;padding:1px 4px;border-radius:4px;cursor:pointer;text-decoration:underline dotted;}
+.error-word{color:inherit;cursor:pointer;border-bottom:1px solid #ccc;}
 
 button{font-family:inherit;font-size:14px;cursor:pointer;border:1px solid #d8d7d0;border-radius:8px;padding:8px 16px;background:#fff;color:#1a1a18;transition:all 0.12s;}
 button:hover{background:#f0efe8;border-color:#aaa;}
@@ -323,7 +323,7 @@ function renderGap(){
     <div class="qcard">
       <div class="qcat">Gap fill</div>
       <span class="qtype-badge badge-${q.type}">Conditional ${q.type}</span>
-      <div class="qsentence">${q.sentence.replace('__',`<span class="blank">${q.blank}</span>`)}</div>
+      <div class="qsentence">${q.sentence.replace('__','<span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>')}</div>
       <div class="opts">${opts.map(o=>`<button class="opt" onclick="checkGap(this,'${o.replace(/'/g,"\\'")}','${q.correct===q.opts.indexOf(o)}')">${o}</button>`).join('')}</div>
       <div class="qfb" id="gap-fb"></div>
       <div class="explain" id="gap-exp">${q.explain}</div>
@@ -333,9 +333,9 @@ function checkGap(btn,chosen,isOk){
   if(gAnswered)return;
   gAnswered=true;gTotal++;
   const correct=GAP_QS[gOrder[gqi]].opts[GAP_QS[gOrder[gqi]].correct];
-  document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
+  document.querySelectorAll('#gap-opts .opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
   const fb=document.getElementById('gap-fb');
-  if(isOk==='true'){btn.classList.add('correct');gCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
+  if(isOk){btn.classList.add('correct');gCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
   else{btn.classList.add('wrong');fb.textContent='✗ Správna odpoveď: '+correct;fb.style.color='#A32D2D';}
   document.getElementById('gap-score').textContent=gCorrect;
   document.getElementById('gap-exp').style.display='block';
@@ -417,7 +417,7 @@ function renderErr(){
     <div class="qcard">
       <div class="qcat">Error correction</div>
       <div style="font-size:13px;color:#888;margin-bottom:10px;line-height:1.5;">
-        ${hasError ? '❌ Táto veta obsahuje <strong>chybu</strong>. Klikni na chybné slovo.' : '✅ Niektoré vety sú správne — klikni na "Bez chyby" ak si myslíš, že veta je v poriadku.'}
+        Nájdi chybu v tejto vete a klikni na ňu. Ak je veta správna, klikni "Bez chyby".
       </div>
       <div class="error-sentence">${sentenceHTML}</div>
       <button class="sm" onclick="noError()" style="margin-bottom:0.75rem;">✓ Bez chyby</button>
@@ -508,22 +508,28 @@ function renderMx(){
   document.getElementById('mx-bar').style.width=Math.round(mxi/MIXED_QS.length*100)+'%';
   document.getElementById('mx-hint').style.display='block';
   document.getElementById('mx-next').style.display='none';
-  document.getElementById('mx-card').innerHTML=`
+   document.getElementById('mx-card').innerHTML=`
     <div class="qcard">
       <div class="qcat">Mixed drill – ktorý typ conditional je to?</div>
-      <div class="qsentence">${q.sentence.replace('__',`<span class="blank">${q.blank}</span>`)}</div>
-      <div class="opts">${opts.map(o=>`<button class="opt" onclick="checkMx(this,'${o.replace(/'/g,"\'")}','${q.correct===q.opts.indexOf(o)}')">${o}</button>`).join('')}</div>
+      <div class="qsentence">${q.sentence.replace('__','<span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>')}</div>
+      <div class="opts" id="mx-opts"></div>
       <div class="qfb" id="mx-fb"></div>
       <div class="explain" id="mx-exp">${q.explain}</div>
     </div>`;
-}
-function checkMx(btn,chosen,isOk){
+  opts.forEach((o) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = o;
+    btn.addEventListener('click', () => checkMx(btn, o, q.correct === q.opts.indexOf(o)));
+    document.getElementById('mx-opts').appendChild(btn);
+  });
+}function checkMx(btn,chosen,isOk){
   if(mxAnswered)return;
   mxAnswered=true;mxTotal++;
   const correct=MIXED_QS[mxOrder[mxi]].opts[MIXED_QS[mxOrder[mxi]].correct];
-  document.querySelectorAll('#mx-card .opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
+  document.querySelectorAll('#mx-opts .opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
   const fb=document.getElementById('mx-fb');
-  if(isOk==='true'){btn.classList.add('correct');mxCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
+  if(isOk){btn.classList.add('correct');mxCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
   else{btn.classList.add('wrong');fb.textContent='✗ Správna odpoveď: '+correct;fb.style.color='#A32D2D';}
   document.getElementById('mx-score').textContent=mxCorrect;
   document.getElementById('mx-exp').style.display='block';
@@ -661,19 +667,26 @@ function renderMc(){
     <div class="qcard">
       <div class="qcat">Mixed conditionals</div>
       <span class="qtype-badge" style="background:${typeColor}22;color:${typeColor};">${q.type}</span>
-      <div class="qsentence">${q.sentence.replace(q.blank,`<span class="blank">${q.blank}</span>`)}</div>
-      <div class="opts">${opts.map(o=>`<button class="opt" onclick="checkMc(this,'${o.replace(/'/g,"\'")}','${q.correct===q.opts.indexOf(o)}')">${o}</button>`).join('')}</div>
+      <div class="qsentence">${q.sentence.replace('__','<span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>')}</div>
+      <div class="opts" id="mc-opts"></div>
       <div class="qfb" id="mc-fb"></div>
       <div class="explain" id="mc-exp">${q.explain}</div>
     </div>`;
+  opts.forEach((o,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = o;
+    btn.addEventListener('click', () => checkMc(btn, o, q.correct === q.opts.indexOf(o)));
+    document.getElementById('mc-opts').appendChild(btn);
+  });
 }
 function checkMc(btn,chosen,isOk){
   if(mcAnswered)return;
   mcAnswered=true;mcTotal++;
   const correct=MC_QS[mcOrder[mci]].opts[MC_QS[mcOrder[mci]].correct];
-  document.querySelectorAll('#mc-card .opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
+  document.querySelectorAll('#mc-opts .opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
   const fb=document.getElementById('mc-fb');
-  if(isOk==='true'){btn.classList.add('correct');mcCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
+  if(isOk){btn.classList.add('correct');mcCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
   else{btn.classList.add('wrong');fb.textContent='✗ Správna odpoveď: '+correct;fb.style.color='#A32D2D';}
   document.getElementById('mc-score').textContent=mcCorrect;
   document.getElementById('mc-exp').style.display='block';
