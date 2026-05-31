@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conditionals Trainer – 0, 1, 2, 3</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh;}
+header{background:#fff;border-bottom:1px solid #e8e7e0;padding:1rem 1.5rem;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;}
+header h1{font-size:16px;font-weight:500;flex:1;}
+header span{font-size:12px;color:#888;background:#f0efe8;padding:3px 10px;border-radius:12px;}
+.container{max-width:700px;margin:0 auto;padding:1.25rem 1rem 4rem;}
+
+/* TABS */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1.25rem;}
+.tab{background:#fff;border:1px solid #e0dfd8;border-radius:10px;padding:10px 8px;font-size:13px;cursor:pointer;color:#666;font-family:inherit;text-align:center;line-height:1.3;transition:all 0.15s;}
+.tab:hover{border-color:#bbb;color:#333;}
+.tab.active{background:#1a1a18;border-color:#1a1a18;color:#fff;font-weight:500;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* REFERENCE */
+.ref-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:1rem;}
+.ref-card{background:#fff;border:1px solid #e0dfd8;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;}
+.ref-card:hover{border-color:#bbb;}
+.ref-type{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;}
+.ref-name{font-size:15px;font-weight:500;margin-bottom:4px;}
+.ref-use{font-size:13px;color:#666;margin-bottom:8px;line-height:1.5;}
+.ref-form{font-size:13px;background:#f5f4f0;border-radius:8px;padding:8px 10px;font-family:monospace;line-height:1.6;display:none;}
+.ref-ex{font-size:13px;color:#555;font-style:italic;margin-top:6px;display:none;}
+.c0{border-left:3px solid #1D9E75;}.c0 .ref-type{color:#1D9E75;}
+.c1{border-left:3px solid #0C447C;}.c1 .ref-type{color:#0C447C;}
+.c2{border-left:3px solid #9d80d8;}.c2 .ref-type{color:#9d80d8;}
+.c3{border-left:3px solid #e08030;}.c3 .ref-type{color:#e08030;}
+
+/* QUIZ SHARED */
+.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.score-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.3px;}
+.score-val{font-size:20px;font-weight:500;}
+.prog-text{font-size:13px;color:#888;}
+.prog-wrap{height:3px;background:#e0dfd8;border-radius:2px;margin-bottom:1.25rem;overflow:hidden;}
+.prog-bar{height:3px;background:#1D9E75;border-radius:2px;transition:width 0.4s;}
+.qcard{background:#fff;border:1px solid #e0dfd8;border-radius:12px;padding:1.25rem;margin-bottom:0.75rem;}
+.qcat{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:#aaa;margin-bottom:8px;}
+.qtype-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-bottom:10px;font-weight:500;}
+.badge-0{background:#E1F5EE;color:#085041;}
+.badge-1{background:#E6F1FB;color:#0C447C;}
+.badge-2{background:#EEEDFE;color:#3C3489;}
+.badge-3{background:#FAEEDA;color:#633806;}
+.qsentence{font-size:15px;line-height:1.8;color:#1a1a18;margin-bottom:1.1rem;}
+.blank{display:inline-block;min-width:120px;border-bottom:2px solid #999;padding:0 4px;color:transparent;font-style:italic;text-align:center;vertical-align:bottom;user-select:none;}
+.opts{display:flex;flex-direction:column;gap:7px;margin-bottom:0.75rem;}
+.opt{background:#f5f4f0;border:1px solid #e0dfd8;border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;color:#1a1a18;font-family:inherit;text-align:left;transition:all 0.12s;line-height:1.4;}
+.opt:hover{background:#fff;border-color:#aaa;}
+.opt.correct{background:#EAF3DE;border-color:#639922;color:#27500A;}
+.opt.wrong{background:#FCEBEB;border-color:#A32D2D;color:#501313;}
+.opt.reveal{background:#EAF3DE;border-color:#639922;color:#27500A;}
+.qfb{font-size:14px;font-weight:500;min-height:18px;margin-bottom:0.5rem;}
+.explain{font-size:13px;color:#555;line-height:1.6;padding:8px 12px;background:#f5f4f0;border-radius:8px;margin-bottom:0.75rem;display:none;}
+.nav-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:0.5rem;flex-wrap:wrap;}
+
+/* TYPE INPUT */
+.type-input{width:100%;font-size:14px;border:1px solid #d8d7d0;border-radius:8px;padding:9px 11px;font-family:inherit;margin-bottom:8px;}
+.type-input:focus{outline:none;border-color:#9d80d8;}
+
+/* MATCHING */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;}
+.match-item{background:#f5f4f0;border:1px solid #e0dfd8;border-radius:8px;padding:10px 12px;font-size:13px;cursor:pointer;transition:all 0.15s;line-height:1.4;}
+.match-item:hover{border-color:#bbb;background:#fff;}
+.match-item.selected{background:#EEEDFE;border-color:#9d80d8;color:#2d1a4a;}
+.match-item.matched-ok{background:#EAF3DE;border-color:#639922;color:#27500A;pointer-events:none;}
+.match-item.matched-err{background:#FCEBEB;border-color:#A32D2D;color:#501313;}
+.match-col-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:#aaa;margin-bottom:6px;}
+
+/* ERROR CORRECTION */
+.error-sentence{font-size:15px;line-height:1.8;color:#1a1a18;margin-bottom:1rem;padding:10px 12px;background:#f5f4f0;border-radius:8px;}
+.error-word{color:inherit;cursor:pointer;border-bottom:1px solid #ccc;}
+
+button{font-family:inherit;font-size:14px;cursor:pointer;border:1px solid #d8d7d0;border-radius:8px;padding:8px 16px;background:#fff;color:#1a1a18;transition:all 0.12s;}
+button:hover{background:#f0efe8;border-color:#aaa;}
+button.primary{background:#1a1a18;color:#fff;border-color:#1a1a18;}
+button.primary:hover{background:#333;}
+button.sm{font-size:13px;padding:6px 13px;}
+
+.done-card{background:#fff;border:1px solid #e0dfd8;border-radius:12px;padding:2rem;text-align:center;margin-bottom:1rem;}
+.done-title{font-size:20px;font-weight:500;margin-bottom:6px;}
+.done-sub{font-size:15px;color:#777;}
+
+@media(max-width:500px){
+  .tabs{grid-template-columns:1fr 1fr;}
+  .match-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Conditionals Trainer</h1>
+  <span>0 · 1 · 2 · 3</span>
+</header>
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="showSection('ref',this)">📖 Reference<br><span style="font-size:11px;opacity:0.7;">prehľad typov</span></button>
+    <button class="tab" onclick="showSection('gap',this)">✏️ Gap fill<br><span style="font-size:11px;opacity:0.7;">20 otázok</span></button>
+    <button class="tab" onclick="showSection('transform',this)">🔄 Transform<br><span style="font-size:11px;opacity:0.7;">15 otázok</span></button>
+    <button class="tab" onclick="showSection('error',this)">🔍 Error fix<br><span style="font-size:11px;opacity:0.7;">12 otázok</span></button>
+    <button class="tab" onclick="showSection('mixed',this)">🎲 Mixed drill<br><span style="font-size:11px;opacity:0.7;">20 otázok, bez označenia</span></button>
+    <button class="tab" onclick="showSection('mixcond',this)">⚡ Mixed conditionals<br><span style="font-size:11px;opacity:0.7;">reference + cvičenia</span></button>
+  </div>
+
+  <!-- REFERENCE -->
+  <div id="s-ref" class="section active">
+    <p style="font-size:13px;color:#888;margin-bottom:1rem;">Klikni na kartu pre formulku a príklady.</p>
+    <div class="ref-grid" id="ref-grid"></div>
+  </div>
+
+  <!-- GAP FILL -->
+  <div id="s-gap" class="section">
+    <div class="prog-row">
+      <div><div class="score-label">Správne</div><div class="score-val" id="gap-score">0</div></div>
+      <div class="prog-text" id="gap-prog">Otázka 1 / 20</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="gap-bar" style="width:0%"></div></div>
+    <div id="gap-card"></div>
+    <div class="nav-row">
+      <button class="sm" id="gap-hint" onclick="showGapHint()">Zobraziť vysvetlenie</button>
+      <button class="sm primary" id="gap-next" onclick="nextGap()" style="display:none;">Ďalšia →</button>
+    </div>
+  </div>
+
+  <!-- TRANSFORM -->
+  <div id="s-transform" class="section">
+    <div class="prog-row">
+      <div><div class="score-label">Správne</div><div class="score-val" id="tr-score">0</div></div>
+      <div class="prog-text" id="tr-prog">Otázka 1 / 15</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="tr-bar" style="width:0%"></div></div>
+    <div id="tr-card"></div>
+    <div class="nav-row">
+      <button class="sm" id="tr-hint" onclick="showTrHint()">Zobraziť odpoveď</button>
+      <button class="sm primary" id="tr-next" onclick="nextTr()" style="display:none;">Ďalšia →</button>
+    </div>
+  </div>
+
+  <!-- ERROR FIX -->
+  <div id="s-error" class="section">
+    <div class="prog-row">
+      <div><div class="score-label">Správne</div><div class="score-val" id="err-score">0</div></div>
+      <div class="prog-text" id="err-prog">Otázka 1 / 12</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="err-bar" style="width:0%"></div></div>
+    <div id="err-card"></div>
+    <div class="nav-row">
+      <div id="err-msg" style="font-size:14px;font-weight:500;min-height:18px;"></div>
+      <button class="sm primary" id="err-next" onclick="nextErr()" style="display:none;">Ďalšia →</button>
+    </div>
+  </div>
+
+  <!-- MIXED DRILL -->
+  <div id="s-mixed" class="section">
+    <p style="font-size:13px;color:#888;margin-bottom:1rem;">Všetky typy pomiešané — bez označenia. Vyber správny tvar slovesa.</p>
+    <div class="prog-row">
+      <div><div class="score-label">Správne</div><div class="score-val" id="mx-score">0</div></div>
+      <div class="prog-text" id="mx-prog">Otázka 1 / 20</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="mx-bar" style="width:0%"></div></div>
+    <div id="mx-card"></div>
+    <div class="nav-row">
+      <button class="sm" id="mx-hint" onclick="showMxHint()">Zobraziť vysvetlenie</button>
+      <button class="sm primary" id="mx-next" onclick="nextMx()" style="display:none;">Ďalšia →</button>
+    </div>
+  </div>
+
+  <!-- MIXED CONDITIONALS -->
+  <div id="s-mixcond" class="section">
+
+    <div style="font-size:13px;color:#888;margin-bottom:1rem;line-height:1.6;">
+      Mixed conditionals kombinujú rôzne časy v podmienkovej a výsledkovej vete. Klikni na kartu pre príklady.
+    </div>
+
+    <!-- REFERENCE -->
+    <div id="mc-ref-grid" style="margin-bottom:1.5rem;"></div>
+
+    <!-- QUIZ -->
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:#aaa;margin-bottom:0.75rem;">Cvičenia — Mixed conditionals</div>
+    <div class="prog-row">
+      <div><div class="score-label">Správne</div><div class="score-val" id="mc-score">0</div></div>
+      <div class="prog-text" id="mc-prog">Otázka 1 / 16</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="mc-bar" style="width:0%"></div></div>
+    <div id="mc-card"></div>
+    <div class="nav-row">
+      <button class="sm" id="mc-hint" onclick="showMcHint()">Zobraziť vysvetlenie</button>
+      <button class="sm primary" id="mc-next" onclick="nextMc()" style="display:none;">Ďalšia →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const REFS = [
+  {type:"Zero Conditional",num:0,use:"Všeobecné pravdy, prírodné zákony, zvyky",
+   form:"If/When + present simple → present simple",
+   ex:["If you heat water to 100°C, it boils.","When it rains, the streets get wet.","If you don't sleep, you feel tired."]},
+  {type:"First Conditional",num:1,use:"Reálne, pravdepodobné situácie v budúcnosti",
+   form:"If + present simple → will + infinitive",
+   ex:["If it rains tomorrow, we will cancel the trip.","If you study hard, you will pass the exam.","She will call you if she has time."]},
+  {type:"Second Conditional",num:2,use:"Hypotetické, nepravdepodobné situácie v prítomnosti/budúcnosti",
+   form:"If + past simple → would + infinitive",
+   ex:["If I won the lottery, I would travel the world.","If she were here, she would know what to do.","What would you do if you lost your job?"]},
+  {type:"Third Conditional",num:3,use:"Hypotetické situácie v minulosti — čo by bolo, keby bolo",
+   form:"If + past perfect → would have + past participle",
+   ex:["If I had studied harder, I would have passed the exam.","She wouldn't have been late if she had left earlier.","If they had listened, the accident wouldn't have happened."]},
+];
+
+const GAP_QS = [
+  {type:0,sentence:"If you __ water, it turns to steam.",blank:"boil",opts:["boil","will boil","would boil","boiled"],correct:0,explain:"Zero conditional: If + present simple → present simple. Všeobecná pravda."},
+  {type:1,sentence:"If she studies hard, she __ the test.",blank:"will pass",opts:["will pass","would pass","passes","passed"],correct:0,explain:"First conditional: If + present simple → will + infinitive. Reálna pravdepodobná situácia."},
+  {type:2,sentence:"If I __ a car, I would drive to school.",blank:"had",opts:["had","have","will have","would have"],correct:0,explain:"Second conditional: If + past simple → would + infinitive. Hypotetická situácia v prítomnosti."},
+  {type:3,sentence:"If they had left earlier, they __ the train.",blank:"would have caught",opts:["would have caught","would catch","had caught","will have caught"],correct:0,explain:"Third conditional: If + past perfect → would have + past participle. Hypotetická situácia v minulosti."},
+  {type:0,sentence:"When you mix red and blue, you __ purple.",blank:"get",opts:["get","will get","would get","got"],correct:0,explain:"Zero conditional s 'when'. Všeobecná pravda — vždy platí."},
+  {type:1,sentence:"If it __ tomorrow, we'll stay inside.",blank:"rains",opts:["rains","will rain","rained","would rain"],correct:0,explain:"First conditional: podmienková veta má present simple, nie future."},
+  {type:2,sentence:"I would travel more if I __ more money.",blank:"had",opts:["had","have","will have","would have"],correct:0,explain:"Second conditional: if + past simple. 'Would have' je chyba — never use 'would' in the if-clause."},
+  {type:3,sentence:"She __ the job if she had applied on time.",blank:"would have got",opts:["would have got","would get","had got","got"],correct:0,explain:"Third conditional: would have + past participle vo výsledkovej vete."},
+  {type:1,sentence:"If you don't hurry, you __ the bus.",blank:"will miss",opts:["will miss","would miss","miss","missed"],correct:0,explain:"First conditional s negatívom: If you don't... → will + inf."},
+  {type:2,sentence:"What __ you do if you saw a ghost?",blank:"would",opts:["would","will","do","had"],correct:0,explain:"Second conditional: would + infinitive vo výsledkovej vete."},
+  {type:3,sentence:"If he had taken the medicine, he __ better.",blank:"would have felt",opts:["would have felt","would feel","had felt","feels"],correct:0,explain:"Third conditional: would have + past participle — hovoríme o minulosti."},
+  {type:0,sentence:"If you __ the button, the machine stops.",blank:"press",opts:["press","will press","pressed","would press"],correct:0,explain:"Zero conditional: mechanická závislosť — present simple v oboch vetách."},
+  {type:2,sentence:"If I were you, I __ apologise immediately.",blank:"would",opts:["would","will","should","had"],correct:0,explain:"Second conditional: 'If I were you' je klasická druhá podmienková. Pozor: 'were', nie 'was' — formálny jazyk."},
+  {type:3,sentence:"They wouldn't have argued if they __ each other better.",blank:"had known",opts:["had known","knew","would know","have known"],correct:0,explain:"Third conditional: if + past perfect (had + past participle) v podmienkovej vete."},
+  {type:1,sentence:"If the weather is nice, we __ a barbecue.",blank:"will have",opts:["will have","would have","have","had"],correct:0,explain:"First conditional: reálny plán do budúcnosti — will + infinitive."},
+  {type:2,sentence:"If dogs __ talk, what would they say?",blank:"could",opts:["could","can","will","would"],correct:0,explain:"Second conditional: 'if + past modal (could)' je bežná variácia druhej podmienkej."},
+  {type:3,sentence:"I __ you if I had had your number.",blank:"would have called",opts:["would have called","would call","called","had called"],correct:0,explain:"Third conditional: would have + past participle. 'had had' = minulý čas od 'have'."},
+  {type:0,sentence:"Plants die if they __ enough water.",blank:"don't get",opts:["don't get","won't get","didn't get","wouldn't get"],correct:0,explain:"Zero conditional: všeobecná pravda — present simple s negatívom."},
+  {type:1,sentence:"If you __ me, I'll explain everything.",blank:"meet",opts:["meet","will meet","met","would meet"],correct:0,explain:"First conditional: podmienková veta = present simple (nie future!)."},
+  {type:2,sentence:"She __ happier if she changed her job.",blank:"would be",opts:["would be","will be","is","was"],correct:0,explain:"Second conditional: would + infinitive vo výsledkovej vete — hypotetická situácia."},
+];
+
+const TRANSFORM_QS = [
+  {type:"0→1",instruction:"Zmeň Zero conditional na First conditional.",original:"If you heat metal, it expands.",answer:"If you heat metal, it will expand.",explain:"Zero→First: zmeň druhú present simple na 'will + infinitive'."},
+  {type:"1→2",instruction:"Zmeň First conditional na Second conditional.",original:"If she arrives early, she will get a good seat.",answer:"If she arrived early, she would get a good seat.",explain:"First→Second: zmeň present simple na past simple, 'will' na 'would'."},
+  {type:"2→3",instruction:"Zmeň Second conditional na Third conditional.",original:"If I had more time, I would learn Spanish.",answer:"If I had had more time, I would have learnt Spanish.",explain:"Second→Third: zmeň past simple na past perfect, 'would' na 'would have + pp'."},
+  {type:"1→2",instruction:"Zmeň First conditional na Second conditional.",original:"If he studies, he will pass the exam.",answer:"If he studied, he would pass the exam.",explain:"First→Second: present simple→past simple; will→would."},
+  {type:"Active→Negative",instruction:"Zmeň vetu na zápor (zachovaj typ conditional).",original:"If you invite her, she will come.",answer:"If you don't invite her, she won't come.",explain:"Negácia: don't invite / won't come — zostáva First conditional."},
+  {type:"2→3",instruction:"Zmeň Second conditional na Third conditional.",original:"If they knew the truth, they would be angry.",answer:"If they had known the truth, they would have been angry.",explain:"Second→Third: knew→had known; would be→would have been."},
+  {type:"Question form",instruction:"Zmeň na otázku (zachovaj typ conditional).",original:"If you had a superpower, you would fly.",answer:"What would you do if you had a superpower?",explain:"Second conditional question: What would you...? / What would you do if...?"},
+  {type:"0→1",instruction:"Zmeň Zero conditional na First conditional.",original:"When it snows, the roads get slippery.",answer:"If it snows, the roads will get slippery.",explain:"Zero→First: get→will get."},
+  {type:"Inversion",instruction:"Prepíš vetu s inverziou (bez 'if').",original:"If I had known, I would have helped.",answer:"Had I known, I would have helped.",explain:"Inversion: vynechaj 'if', daj auxiliary na začiatok. Typické pre C1."},
+  {type:"Inversion",instruction:"Prepíš vetu s inverziou (bez 'if').",original:"If she were here, she would know what to do.",answer:"Were she here, she would know what to do.",explain:"Inversion: Were she here... — formálna varianta druhej podmienkej."},
+  {type:"1→2",instruction:"Zmeň First conditional na Second conditional.",original:"If I win the competition, I will buy a new phone.",answer:"If I won the competition, I would buy a new phone.",explain:"First→Second: win→won; will→would."},
+  {type:"3→2",instruction:"Zmeň Third conditional na Second conditional.",original:"If she had taken the job, she would have moved to London.",answer:"If she took the job, she would move to London.",explain:"Third→Second: had taken→took; would have moved→would move."},
+  {type:"Unless",instruction:"Prepíš vetu s 'unless' namiesto 'if not'.",original:"If you don't hurry, you will miss the train.",answer:"Unless you hurry, you will miss the train.",explain:"Unless = if not. Zostáva First conditional, podmienková veta sa zmení na kladnú."},
+  {type:"Unless",instruction:"Prepíš vetu s 'unless' namiesto 'if not'.",original:"She won't come if she isn't invited.",answer:"She won't come unless she is invited.",explain:"Unless + kladná veta = if + záporná veta."},
+  {type:"Question form",instruction:"Zmeň na otázku (zachovaj typ conditional).",original:"If you had studied medicine, you would have become a doctor.",answer:"Would you have become a doctor if you had studied medicine?",explain:"Third conditional question: Would you have...? if you had...?"},
+];
+
+const ERROR_QS = [
+  {sentence:"If I will see her tomorrow, I will tell her the news.",errors:[{word:"will see",correct:"see",reason:"Podmienková veta (if-clause) používa present simple, nie future: 'If I see her...'"}]},
+  {sentence:"She would be happier if she will change her job.",errors:[{word:"will change",correct:"changed",reason:"Second conditional: if + past simple. 'Will change' je chyba — nikdy nepoužívaj 'will' v if-clause druhej podmienkej."}]},
+  {sentence:"If they had study harder, they would have passed.",errors:[{word:"had study",correct:"had studied",reason:"Third conditional: if + past perfect = had + past participle. 'Study' treba zmeniť na 'studied'."}]},
+  {sentence:"I would of helped you if I had known.",errors:[{word:"would of",correct:"would have",reason:"Časté písomná chyba: 'would of' neexistuje. Správne je 'would have' (skrátene 'would've')."}]},
+  {sentence:"If you would come to the party, we would be happy.",errors:[{word:"would come",correct:"came",reason:"Nikdy nepoužívaj 'would' v if-clause. Second conditional: If + past simple → would + infinitive."}]},
+  {sentence:"Unless you don't hurry, you will miss the bus.",errors:[{word:"don't hurry",correct:"hurry",reason:"'Unless' znamená 'if not', takže nepridávaj ďalšiu negáciu. 'Unless you hurry' = 'If you don't hurry'."}]},
+  {sentence:"If she was me, she wouldn't accept the offer.",errors:[{word:"was",correct:"were",reason:"V druhej podmienkej sa vo formálnom anglickom jazyku používa 'were' pre všetky osoby: 'If she were me...'"}]},
+  {sentence:"We would have won if we played better in the second half.",errors:[{word:"played",correct:"had played",reason:"Third conditional: if + past perfect. 'Played' (past simple) patrí do second conditional."}]},
+  {sentence:"If you heat the ice, it will melt.",errors:[]}, // no error
+  {sentence:"Had she knew the answer, she would have told us.",errors:[{word:"knew",correct:"known",reason:"Inversion third conditional: Had + subject + past participle. 'Knew' je past simple — treba 'known' (past participle)."}]},
+  {sentence:"If I have time tomorrow, I'll call you.",errors:[]}, // no error
+  {sentence:"She won't come unless she isn't invited.",errors:[{word:"isn't",correct:"is",reason:"'Unless' = 'if not', takže podmienková veta musí byť v kladnej forme: 'unless she is invited'."}]},
+];
+
+// ─── HELPERS ────────────────────────────────────────────────────────────────
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── REFERENCE ──────────────────────────────────────────────────────────────
+(function(){
+  const g=document.getElementById('ref-grid');
+  REFS.forEach((r,i)=>{
+    const d=document.createElement('div');
+    d.className=`ref-card c${r.num}`;
+    d.innerHTML=`<div class="ref-type">Conditional ${r.num}</div>
+      <div class="ref-name">${r.type}</div>
+      <div class="ref-use">${r.use}</div>
+      <div class="ref-form" id="rf${i}">${r.form}</div>
+      <div class="ref-ex" id="re${i}">${r.ex.map(e=>`• ${e}`).join('<br>')}</div>`;
+    d.onclick=()=>{
+      const f=document.getElementById('rf'+i);
+      const e=document.getElementById('re'+i);
+      const show=f.style.display==='none'||!f.style.display;
+      f.style.display=show?'block':'none';
+      e.style.display=show?'block':'none';
+    };
+    g.appendChild(d);
+  });
+})();
+
+// ─── GAP FILL ───────────────────────────────────────────────────────────────
+let gqi=0,gCorrect=0,gTotal=0,gAnswered=false,gOrder=[];
+function initGap(){gOrder=shuffle([...Array(GAP_QS.length).keys()]);gqi=0;gCorrect=0;gTotal=0;renderGap();}
+function renderGap(){
+  if(gqi>=GAP_QS.length){
+    document.getElementById('gap-card').innerHTML=`<div class="done-card"><div class="done-title">Hotovo! 🎉</div><div class="done-sub">Správne: ${gCorrect} / ${GAP_QS.length}</div></div>`;
+    document.getElementById('gap-next').style.display='none';
+    document.getElementById('gap-hint').textContent='Hrať znova';
+    document.getElementById('gap-hint').onclick=()=>{initGap();document.getElementById('gap-hint').textContent='Zobraziť vysvetlenie';document.getElementById('gap-hint').onclick=showGapHint;};
+    return;
+  }
+  gAnswered=false;
+  const q=GAP_QS[gOrder[gqi]];
+  const opts=shuffle([...q.opts]);
+  document.getElementById('gap-prog').textContent=`Otázka ${gqi+1} / ${GAP_QS.length}`;
+  document.getElementById('gap-bar').style.width=Math.round(gqi/GAP_QS.length*100)+'%';
+  document.getElementById('gap-hint').style.display='block';
+  document.getElementById('gap-next').style.display='none';
+  document.getElementById('gap-card').innerHTML=`
+    <div class="qcard">
+      <div class="qcat">Gap fill</div>
+      <span class="qtype-badge badge-${q.type}">Conditional ${q.type}</span>
+      <div class="qsentence">${q.sentence.replace('__','<span class="blank">___</span>')}</div>
+      <div class="opts">${opts.map(o=>`<button class="opt" onclick="checkGap(this,'${o.replace(/'/g,"\\'")}','${q.correct===q.opts.indexOf(o)}')">${o}</button>`).join('')}</div>
+      <div class="qfb" id="gap-fb"></div>
+      <div class="explain" id="gap-exp">${q.explain}</div>
+    </div>`;
+}
+function checkGap(btn,chosen,isOk){
+  if(gAnswered)return;
+  gAnswered=true;gTotal++;
+  const correct=GAP_QS[gOrder[gqi]].opts[GAP_QS[gOrder[gqi]].correct];
+  document.querySelectorAll('#gap-opts .opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
+  const fb=document.getElementById('gap-fb');
+  if(isOk){btn.classList.add('correct');gCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
+  else{btn.classList.add('wrong');fb.textContent='✗ Správna odpoveď: '+correct;fb.style.color='#A32D2D';}
+  document.getElementById('gap-score').textContent=gCorrect;
+  document.getElementById('gap-exp').style.display='block';
+  document.getElementById('gap-hint').style.display='none';
+  document.getElementById('gap-next').style.display='block';
+  gqi++;
+}
+function showGapHint(){const e=document.getElementById('gap-exp');if(e)e.style.display=e.style.display==='none'?'block':'none';}
+function nextGap(){renderGap();}
+initGap();
+
+// ─── TRANSFORM ──────────────────────────────────────────────────────────────
+let tqi=0,tCorrect=0,tTotal=0,tOrder=[];
+function initTr(){tOrder=shuffle([...Array(TRANSFORM_QS.length).keys()]);tqi=0;tCorrect=0;tTotal=0;renderTr();}
+function renderTr(){
+  if(tqi>=TRANSFORM_QS.length){
+    document.getElementById('tr-card').innerHTML=`<div class="done-card"><div class="done-title">Hotovo! 🎉</div><div class="done-sub">Skóre: ${tCorrect} / ${TRANSFORM_QS.length}</div></div>`;
+    document.getElementById('tr-next').style.display='none';
+    document.getElementById('tr-hint').textContent='Hrať znova';
+    document.getElementById('tr-hint').onclick=()=>{initTr();document.getElementById('tr-hint').textContent='Zobraziť odpoveď';document.getElementById('tr-hint').onclick=showTrHint;};
+    return;
+  }
+  const q=TRANSFORM_QS[tOrder[tqi]];
+  document.getElementById('tr-prog').textContent=`Otázka ${tqi+1} / ${TRANSFORM_QS.length}`;
+  document.getElementById('tr-bar').style.width=Math.round(tqi/TRANSFORM_QS.length*100)+'%';
+  document.getElementById('tr-hint').style.display='block';
+  document.getElementById('tr-next').style.display='none';
+  document.getElementById('tr-card').innerHTML=`
+    <div class="qcard">
+      <div class="qcat">Transform</div>
+      <span class="qtype-badge badge-1">${q.type}</span>
+      <div style="font-size:14px;color:#555;margin-bottom:8px;line-height:1.5;">${q.instruction}</div>
+      <div class="qsentence" style="font-style:italic;color:#444;">"${q.original}"</div>
+      <input class="type-input" id="tr-input" placeholder="Napíš transformovanú vetu..." />
+      <div class="explain" id="tr-exp" style="display:none;">
+        <strong>Odpoveď:</strong> ${q.answer}<br><br>${q.explain}
+      </div>
+    </div>`;
+  document.getElementById('tr-input').addEventListener('keydown', e=>{if(e.key==='Enter')checkTr();});
+}
+function showTrHint(){
+  const e=document.getElementById('tr-exp');
+  if(e.style.display==='none'){
+    e.style.display='block';
+    document.getElementById('tr-next').style.display='block';
+    tqi++;
+    document.getElementById('tr-score').textContent=tCorrect;
+    document.getElementById('tr-hint').style.display='none';
+  }
+}
+function checkTr(){showTrHint();}
+function nextTr(){renderTr();}
+initTr();
+
+// ─── ERROR FIX ──────────────────────────────────────────────────────────────
+let eqi=0,eCorrect=0,eTotal=0,eOrder=[];
+function initErr(){eOrder=shuffle([...Array(ERROR_QS.length).keys()]);eqi=0;eCorrect=0;eTotal=0;renderErr();}
+function renderErr(){
+  if(eqi>=ERROR_QS.length){
+    document.getElementById('err-card').innerHTML=`<div class="done-card"><div class="done-title">Hotovo! 🎉</div><div class="done-sub">Správne: ${eCorrect} / ${ERROR_QS.length}</div></div>`;
+    document.getElementById('err-next').style.display='none';
+    return;
+  }
+  const q=ERROR_QS[eOrder[eqi]];
+  document.getElementById('err-prog').textContent=`Otázka ${eqi+1} / ${ERROR_QS.length}`;
+  document.getElementById('err-bar').style.width=Math.round(eqi/ERROR_QS.length*100)+'%';
+  document.getElementById('err-msg').textContent='';
+  document.getElementById('err-next').style.display='none';
+
+  let sentenceHTML = q.sentence;
+  if(q.errors.length>0){
+    q.errors.forEach(err=>{
+      sentenceHTML=sentenceHTML.replace(err.word,`<span class="error-word" onclick="clickError(this,'${err.word.replace(/'/g,"\\'")}')" data-correct="${err.correct}" data-reason="${err.reason.replace(/"/g,'&quot;')}">${err.word}</span>`);
+    });
+  }
+
+  const hasError = q.errors.length > 0;
+  document.getElementById('err-card').innerHTML=`
+    <div class="qcard">
+      <div class="qcat">Error correction</div>
+      <div style="font-size:13px;color:#888;margin-bottom:10px;line-height:1.5;">
+        Nájdi chybu v tejto vete a klikni na ňu. Ak je veta správna, klikni "Bez chyby".
+      </div>
+      <div class="error-sentence">${sentenceHTML}</div>
+      <button class="sm" onclick="noError()" style="margin-bottom:0.75rem;">✓ Bez chyby</button>
+      <div class="explain" id="err-exp" style="display:none;"></div>
+    </div>`;
+}
+function clickError(el, word){
+  const q=ERROR_QS[eOrder[eqi]];
+  const err=q.errors.find(e=>e.word===word);
+  if(!err)return;
+  eTotal++;eqi++;
+  eCorrect++;
+  document.getElementById('err-score').textContent=eCorrect;
+  document.getElementById('err-msg').textContent='✓ Správne!';
+  document.getElementById('err-msg').style.color='#3B6D11';
+  const exp=document.getElementById('err-exp');
+  exp.innerHTML=`<strong>Chyba:</strong> "${err.word}" → <strong>"${err.correct}"</strong><br><br>${err.reason}`;
+  exp.style.display='block';
+  el.style.background='#EAF3DE';el.style.color='#27500A';el.style.pointerEvents='none';
+  document.querySelectorAll('.error-word').forEach(e=>e.style.pointerEvents='none');
+  document.querySelector('[onclick^="noError"]').style.display='none';
+  document.getElementById('err-next').style.display='block';
+}
+function noError(){
+  const q=ERROR_QS[eOrder[eqi]];
+  eTotal++;eqi++;
+  const isCorrect=q.errors.length===0;
+  if(isCorrect){eCorrect++;}
+  document.getElementById('err-score').textContent=eCorrect;
+  const msg=document.getElementById('err-msg');
+  const exp=document.getElementById('err-exp');
+  if(isCorrect){
+    msg.textContent='✓ Správne — veta nemá chybu!';
+    msg.style.color='#3B6D11';
+    exp.innerHTML='Táto veta je gramaticky správna.';
+  } else {
+    msg.textContent='✗ Veta obsahuje chybu!';
+    msg.style.color='#A32D2D';
+    const err=q.errors[0];
+    exp.innerHTML=`<strong>Chyba:</strong> "${err.word}" → <strong>"${err.correct}"</strong><br><br>${err.reason}`;
+  }
+  exp.style.display='block';
+  document.querySelectorAll('.error-word').forEach(e=>e.style.pointerEvents='none');
+  document.querySelector('[onclick^="noError"]').style.display='none';
+  document.getElementById('err-next').style.display='block';
+}
+function nextErr(){renderErr();}
+initErr();
+
+// ─── MIXED DRILL ────────────────────────────────────────────────────────────
+const MIXED_QS = [
+  {sentence:"If you __ the button, the alarm goes off.",blank:"press",opts:["press","will press","pressed","would press"],correct:0,explain:"Zero conditional — všeobecná pravda/mechanizmus. If + present simple → present simple."},
+  {sentence:"If she __ harder, she'll get into university.",blank:"studies",opts:["studies","studied","will study","would study"],correct:0,explain:"First conditional — reálna situácia v budúcnosti. If + present simple → will + inf."},
+  {sentence:"If I __ more free time, I'd learn to paint.",blank:"had",opts:["had","have","will have","would have"],correct:0,explain:"Second conditional — hypotetická situácia v prítomnosti. If + past simple → would + inf."},
+  {sentence:"They __ the match if the goalkeeper hadn't been injured.",blank:"would have won",opts:["would have won","would win","had won","won"],correct:0,explain:"Third conditional — hypotetická situácia v minulosti. Would have + past participle."},
+  {sentence:"Water __ when the temperature drops below 0°C.",blank:"freezes",opts:["freezes","will freeze","froze","would freeze"],correct:0,explain:"Zero conditional — prírodný zákon. Present simple v oboch vetách."},
+  {sentence:"If he __ the job offer, he'll have to move abroad.",blank:"accepts",opts:["accepts","accepted","will accept","would accept"],correct:0,explain:"First conditional — reálna možnosť. If-clause = present simple."},
+  {sentence:"I'd be surprised if she __ the truth.",blank:"told",opts:["told","tells","will tell","would tell"],correct:0,explain:"Second conditional — nepravdepodobná situácia. If + past simple → would + inf."},
+  {sentence:"If they __ earlier, they wouldn't have missed the flight.",blank:"had left",opts:["had left","left","would leave","have left"],correct:0,explain:"Third conditional — iná minulosť. If + past perfect → would have + pp."},
+  {sentence:"Plants grow faster if they __ enough sunlight.",blank:"get",opts:["get","will get","got","would get"],correct:0,explain:"Zero conditional — všeobecná pravda o rastlinách. Present simple v oboch vetách."},
+  {sentence:"Unless you __, you won't finish on time.",blank:"hurry",opts:["hurry","will hurry","hurried","would hurry"],correct:0,explain:"First conditional s unless (= if not). Unless + present simple → will + inf."},
+  {sentence:"If I __ you, I'd talk to her directly.",blank:"were",opts:["were","am","will be","would be"],correct:0,explain:"Second conditional — 'If I were you' je klasická fráza. Formálne: 'were', nie 'was'."},
+  {sentence:"She __ the promotion if she had worked harder.",blank:"would have got",opts:["would have got","would get","got","had got"],correct:0,explain:"Third conditional — hypotetická minulosť. Would have + past participle."},
+  {sentence:"If you __ milk too long, it goes sour.",blank:"leave",opts:["leave","will leave","left","would leave"],correct:0,explain:"Zero conditional — všeobecná pravda. Present simple v oboch vetách."},
+  {sentence:"If the weather __ nice this weekend, we'll go camping.",blank:"is",opts:["is","will be","were","would be"],correct:0,explain:"First conditional — reálny plán. If-clause = present simple (nie future!)."},
+  {sentence:"What __ you do if you found a wallet on the street?",blank:"would",opts:["would","will","do","had"],correct:0,explain:"Second conditional — hypotetická situácia. What would you do if + past simple?"},
+  {sentence:"If he had taken his medicine, he __ sick.",blank:"wouldn't have got",opts:["wouldn't have got","wouldn't get","hadn't got","didn't get"],correct:0,explain:"Third conditional — iná minulosť. Would have + past participle (záporné)."},
+  {sentence:"When you __ iron, it expands.",blank:"heat",opts:["heat","will heat","heated","would heat"],correct:0,explain:"Zero conditional s 'when'. Fyzikálny zákon — present simple."},
+  {sentence:"If you see Tom, __ him I said hello.",blank:"tell",opts:["tell","will tell","told","would tell"],correct:0,explain:"First conditional s imperatívom. If + present simple → imperatív (tell!)."},
+  {sentence:"If she __ the truth, she'd be shocked.",blank:"knew",opts:["knew","knows","will know","would know"],correct:0,explain:"Second conditional — hypotetická situácia. If + past simple → would + inf."},
+  {sentence:"We wouldn't have got lost if we __ the map.",blank:"had checked",opts:["had checked","checked","would check","have checked"],correct:0,explain:"Third conditional — iná minulosť. If + past perfect → would have + pp."},
+];
+
+let mxi=0,mxCorrect=0,mxTotal=0,mxAnswered=false,mxOrder=[];
+function initMx(){mxOrder=shuffle([...Array(MIXED_QS.length).keys()]);mxi=0;mxCorrect=0;mxTotal=0;renderMx();}
+function renderMx(){
+  if(mxi>=MIXED_QS.length){
+    document.getElementById('mx-card').innerHTML=`<div class="done-card"><div class="done-title">Hotovo! 🎉</div><div class="done-sub">Správne: ${mxCorrect} / ${MIXED_QS.length}</div></div>`;
+    document.getElementById('mx-next').style.display='none';
+    document.getElementById('mx-hint').textContent='Hrať znova';
+    document.getElementById('mx-hint').onclick=()=>{initMx();document.getElementById('mx-hint').textContent='Zobraziť vysvetlenie';document.getElementById('mx-hint').onclick=showMxHint;};
+    return;
+  }
+  mxAnswered=false;
+  const q=MIXED_QS[mxOrder[mxi]];
+  const opts=shuffle([...q.opts]);
+  document.getElementById('mx-prog').textContent=`Otázka ${mxi+1} / ${MIXED_QS.length}`;
+  document.getElementById('mx-bar').style.width=Math.round(mxi/MIXED_QS.length*100)+'%';
+  document.getElementById('mx-hint').style.display='block';
+  document.getElementById('mx-next').style.display='none';
+   document.getElementById('mx-card').innerHTML=`
+    <div class="qcard">
+      <div class="qcat">Mixed drill – ktorý typ conditional je to?</div>
+      <div class="qsentence">${q.sentence.replace('__','<span class="blank">___</span>')}</div>
+      <div class="opts" id="mx-opts"></div>
+      <div class="qfb" id="mx-fb"></div>
+      <div class="explain" id="mx-exp">${q.explain}</div>
+    </div>`;
+  opts.forEach((o) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = o;
+    btn.addEventListener('click', () => checkMx(btn, o, q.correct === q.opts.indexOf(o)));
+    document.getElementById('mx-opts').appendChild(btn);
+  });
+}function checkMx(btn,chosen,isOk){
+  if(mxAnswered)return;
+  mxAnswered=true;mxTotal++;
+  const correct=MIXED_QS[mxOrder[mxi]].opts[MIXED_QS[mxOrder[mxi]].correct];
+  document.querySelectorAll('#mx-opts .opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
+  const fb=document.getElementById('mx-fb');
+  if(isOk){btn.classList.add('correct');mxCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
+  else{btn.classList.add('wrong');fb.textContent='✗ Správna odpoveď: '+correct;fb.style.color='#A32D2D';}
+  document.getElementById('mx-score').textContent=mxCorrect;
+  document.getElementById('mx-exp').style.display='block';
+  document.getElementById('mx-hint').style.display='none';
+  document.getElementById('mx-next').style.display='block';
+  mxi++;
+}
+function showMxHint(){const e=document.getElementById('mx-exp');if(e)e.style.display=e.style.display==='none'?'block':'none';}
+function nextMx(){renderMx();}
+initMx();
+
+
+// ─── MIXED CONDITIONALS ─────────────────────────────────────────────────────
+const MC_REFS = [
+  {
+    type:"Past → Present",
+    title:"3rd if-clause + 2nd result",
+    use:"Minulá situácia má vplyv na prítomnosť",
+    form:"If + past perfect → would + infinitive",
+    ex:[
+      "If I had studied medicine, I would be a doctor now.",
+      "If she hadn't missed the interview, she would have a job today.",
+      "If he had taken better care of himself, he wouldn't be so ill now."
+    ],
+    note:"Kľúčové slová vo výsledkovej vete: now, today, at the moment"
+  },
+  {
+    type:"Present → Past",
+    title:"2nd if-clause + 3rd result",
+    use:"Prítomná situácia ovplyvňuje minulý výsledok",
+    form:"If + past simple → would have + past participle",
+    ex:[
+      "If I were braver, I would have spoken up at the meeting.",
+      "If she were more organised, she wouldn't have forgotten the deadline.",
+      "If he didn't trust her, he wouldn't have lent her the money."
+    ],
+    note:"Kľúčové slová v if-clause: were, didn't — hovoríme o vlastnosti/charaktere"
+  },
+  {
+    type:"Porovnanie s 2nd a 3rd",
+    title:"Rozdiel: Mixed vs čisté conditionals",
+    use:"Kedy použiť mixed a kedy čistý 2nd/3rd?",
+    form:"Závisí od časového rámca výsledku",
+    ex:[
+      "If I had studied harder, I would have passed. (3rd — minulosť→minulosť)",
+      "If I had studied harder, I would be at university now. (Mixed — minulosť→prítomnosť)",
+      "If I were smarter, I would have solved it. (Mixed — prítomnosť→minulosť)"
+    ],
+    note:"Kľúč: kde je 'now/today'? → výsledok v prítomnosti = mixed (past→present)"
+  },
+];
+
+const MC_QS = [
+  {type:"Past→Present",sentence:"If she __ the job offer, she would be living in Paris now.",blank:"had accepted",opts:["had accepted","accepted","would accept","has accepted"],correct:0,
+   explain:"Mixed conditional (Past→Present): if + past perfect → would + inf. Minulé rozhodnutie ovplyvňuje prítomnosť ('now')."},
+  {type:"Past→Present",sentence:"If he hadn't dropped out of university, he __ a lawyer now.",blank:"would be",opts:["would be","would have been","was","will be"],correct:0,
+   explain:"Mixed conditional (Past→Present): výsledok je v prítomnosti ('now') → would + inf (nie would have been)."},
+  {type:"Present→Past",sentence:"If she __ more careful, she wouldn't have made that mistake.",blank:"were",opts:["were","had been","was","would be"],correct:0,
+   explain:"Mixed conditional (Present→Past): if + past simple (were) → would have + pp. Hovoríme o jej charaktere (prítomnosť)."},
+  {type:"Past→Present",sentence:"If they __ a map, they wouldn't be lost right now.",blank:"had brought",opts:["had brought","brought","would bring","have brought"],correct:0,
+   explain:"Mixed conditional (Past→Present): minulá akcia ('had brought') → prítomný výsledok ('right now')."},
+  {type:"Present→Past",sentence:"If I __ afraid of flying, I would have visited her in Australia.",blank:"weren't",opts:["weren't","hadn't been","wouldn't be","won't be"],correct:0,
+   explain:"Mixed conditional (Present→Past): prítomná vlastnosť (strach z lietania) → minulý výsledok (would have visited)."},
+  {type:"Past→Present",sentence:"If he had learned to drive, he __ able to take us to the airport.",blank:"would be",opts:["would be","would have been","was","will be"],correct:0,
+   explain:"Mixed conditional (Past→Present): 'would be able to' → výsledok v prítomnosti. Minulá akcia ovplyvňuje súčasnosť."},
+  {type:"Present→Past",sentence:"If she __ so stubborn, she would have asked for help.",blank:"weren't",opts:["weren't","hadn't been","isn't","won't be"],correct:0,
+   explain:"Mixed conditional (Present→Past): 'weren't' = prítomná vlastnosť → 'would have asked' = minulý výsledok."},
+  {type:"Past→Present",sentence:"If I had taken that job in Berlin, I __ German fluently by now.",blank:"would speak",opts:["would speak","would have spoken","spoke","will speak"],correct:0,
+   explain:"Mixed conditional (Past→Present): 'by now' signalizuje prítomnosť → would + inf (nie would have)."},
+  {type:"Identify",sentence:"Which is a Mixed conditional? A: If I had known, I would have helped. B: If I had known, I would know what to do now.",blank:"B",opts:["A — minulosť→minulosť","B — minulosť→prítomnosť","Both are mixed","Neither is mixed"],correct:1,
+   explain:"A je čistý Third conditional (minulosť→minulosť). B je Mixed (Past→Present) — 'now' signalizuje prítomný výsledok."},
+  {type:"Present→Past",sentence:"If he __ more ambitious, he would have applied for the promotion.",blank:"were",opts:["were","had been","has been","would be"],correct:0,
+   explain:"Mixed conditional (Present→Past): jeho ambícia je prítomná vlastnosť (were) → minulý výsledok (would have applied)."},
+  {type:"Past→Present",sentence:"We __ so tired now if we hadn't driven through the night.",blank:"wouldn't be",opts:["wouldn't be","wouldn't have been","weren't","won't be"],correct:0,
+   explain:"Mixed conditional (Past→Present): záporná forma — wouldn't be (prítomnosť) + hadn't driven (minulosť)."},
+  {type:"Present→Past",sentence:"If I __ a morning person, I wouldn't have missed the early train.",blank:"were",opts:["were","had been","am","would be"],correct:0,
+   explain:"Mixed conditional (Present→Past): 'were a morning person' = prítomná vlastnosť/charakter → minulý výsledok."},
+  {type:"Past→Present",sentence:"If she had married him, she __ unhappy now.",blank:"would be",opts:["would be","would have been","was","will be"],correct:0,
+   explain:"Mixed conditional (Past→Present): minulé rozhodnutie (had married) → prítomný stav (would be now)."},
+  {type:"Identify",sentence:"Dokonči vetu: 'If I were more confident, ___'",blank:"I would have spoken at the conference.",opts:["I would have spoken at the conference.","I would speak at the conference.","I had spoken at the conference.","I will speak at the conference."],correct:0,
+   explain:"Mixed conditional (Present→Past): 'were more confident' = prítomná vlastnosť → výsledok v minulosti = would have spoken."},
+  {type:"Past→Present",sentence:"If he __ his savings, he would have money to travel now.",blank:"hadn't spent",opts:["hadn't spent","didn't spend","wouldn't spend","hasn't spent"],correct:0,
+   explain:"Mixed conditional (Past→Present): záporné — hadn't spent (minulosť) → would have money now (prítomnosť)."},
+  {type:"Present→Past",sentence:"If they __ better teammates, they would have won the championship.",blank:"were",opts:["were","had been","are","would be"],correct:0,
+   explain:"Mixed conditional (Present→Past): 'were better teammates' = prítomná charakteristika → 'would have won' = minulý výsledok."},
+];
+
+// Build reference cards
+(function(){
+  const g = document.getElementById('mc-ref-grid');
+  MC_REFS.forEach((r,i) => {
+    const colors = ['#1D9E75','#9d80d8','#e08030'];
+    const d = document.createElement('div');
+    d.className = 'ref-card';
+    d.style.borderLeft = `3px solid ${colors[i]}`;
+    d.style.cursor = 'pointer';
+    d.innerHTML = `
+      <div class="ref-type" style="color:${colors[i]};">${r.type}</div>
+      <div class="ref-name">${r.title}</div>
+      <div class="ref-use">${r.use}</div>
+      <div class="ref-form" id="mcrf${i}" style="display:none;">${r.form}</div>
+      <div class="ref-ex" id="mcre${i}" style="display:none;">${r.ex.map(e=>`• ${e}`).join('<br>')}<br><br><strong>💡 ${r.note}</strong></div>`;
+    d.onclick = () => {
+      const f = document.getElementById('mcrf'+i);
+      const e = document.getElementById('mcre'+i);
+      const show = f.style.display === 'none';
+      f.style.display = show ? 'block' : 'none';
+      e.style.display = show ? 'block' : 'none';
+    };
+    g.appendChild(d);
+  });
+})();
+
+let mci=0,mcCorrect=0,mcTotal=0,mcAnswered=false,mcOrder=[];
+function initMc(){mcOrder=shuffle([...Array(MC_QS.length).keys()]);mci=0;mcCorrect=0;mcTotal=0;renderMc();}
+function renderMc(){
+  if(mci>=MC_QS.length){
+    document.getElementById('mc-card').innerHTML=`<div class="done-card"><div class="done-title">Hotovo! 🎉</div><div class="done-sub">Správne: ${mcCorrect} / ${MC_QS.length}</div></div>`;
+    document.getElementById('mc-next').style.display='none';
+    document.getElementById('mc-hint').textContent='Hrať znova';
+    document.getElementById('mc-hint').onclick=()=>{initMc();document.getElementById('mc-hint').textContent='Zobraziť vysvetlenie';document.getElementById('mc-hint').onclick=showMcHint;};
+    return;
+  }
+  mcAnswered=false;
+  const q=MC_QS[mcOrder[mci]];
+  const opts=shuffle([...q.opts]);
+  document.getElementById('mc-prog').textContent=`Otázka ${mci+1} / ${MC_QS.length}`;
+  document.getElementById('mc-bar').style.width=Math.round(mci/MC_QS.length*100)+'%';
+  document.getElementById('mc-hint').style.display='block';
+  document.getElementById('mc-next').style.display='none';
+
+  const typeColor = q.type==='Past→Present'?'#1D9E75':q.type==='Present→Past'?'#9d80d8':'#e08030';
+  
+  document.getElementById('mc-card').innerHTML=`
+    <div class="qcard">
+      <div class="qcat">Mixed conditionals</div>
+      <span class="qtype-badge" style="background:${typeColor}22;color:${typeColor};">${q.type}</span>
+      <div class="qsentence">${q.sentence.replace(q.blank,'<span class="blank">___</span>')}</div>
+      <div class="opts" id="mc-opts"></div>
+      <div class="qfb" id="mc-fb"></div>
+      <div class="explain" id="mc-exp">${q.explain}</div>
+    </div>`;
+  opts.forEach((o,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = o;
+    btn.addEventListener('click', () => checkMc(btn, o, q.correct === q.opts.indexOf(o)));
+    document.getElementById('mc-opts').appendChild(btn);
+  });
+}
+function checkMc(btn,chosen,isOk){
+  if(mcAnswered)return;
+  mcAnswered=true;mcTotal++;
+  const correct=MC_QS[mcOrder[mci]].opts[MC_QS[mcOrder[mci]].correct];
+  document.querySelectorAll('#mc-opts .opt').forEach(b=>{b.style.pointerEvents='none';if(b.textContent===correct)b.classList.add('reveal');});
+  const fb=document.getElementById('mc-fb');
+  if(isOk){btn.classList.add('correct');mcCorrect++;fb.textContent='✓ Správne!';fb.style.color='#3B6D11';}
+  else{btn.classList.add('wrong');fb.textContent='✗ Správna odpoveď: '+correct;fb.style.color='#A32D2D';}
+  document.getElementById('mc-score').textContent=mcCorrect;
+  document.getElementById('mc-exp').style.display='block';
+  document.getElementById('mc-hint').style.display='none';
+  document.getElementById('mc-next').style.display='block';
+  mci++;
+}
+function showMcHint(){const e=document.getElementById('mc-exp');if(e)e.style.display=e.style.display==='none'?'block':'none';}
+function nextMc(){renderMc();}
+initMc();
+
+</script>
+</body>
+</html>
